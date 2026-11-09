@@ -58,7 +58,7 @@ DATADIR = os.path.join(ROOTDIR, 'data')
 
 
 TICMAP = {
-'A': 'Agilent Technologies, Inc.',
+    'A': 'Agilent Technologies, Inc.',
     'ABT': 'Abbott Laboratories',
     'AES': 'The AES Corporation',
     'AIG': 'American International Group, Inc.',
@@ -108,7 +108,7 @@ TICMAP = {
     'WFC': 'Wells Fargo & Company',
     'WMB': 'The Williams Companies, Inc.',
     'XOM': 'Exxon Mobil Corporation',
-         }
+}
 
 TICKERS = sorted(TICMAP.keys())
 
