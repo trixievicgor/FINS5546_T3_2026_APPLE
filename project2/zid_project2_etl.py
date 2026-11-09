@@ -9,8 +9,11 @@
 # Note: please keep the aliases consistent throughout the project.
 #       For details, review the import statements in zid_project2_main.py
 
-# <COMPLETE THIS PART>
-
+import os
+import pandas as pd
+import yfinance as yf
+import config as cfg
+import util
 
 # ----------------------------------------------------------------------------
 # Part 4.2: Complete the download_prc_to_csv function
@@ -74,7 +77,13 @@ def download_prc_to_csv(start, end, tickers=cfg.TICKERS):
         Your output files should follow the same format and contain similar types of content.
         The order of the columns does not necessarily need to be the same.
     """
-    # <COMPLETE THIS PART>
+    yf_end = (pd.to_datetime(end) + pd.Timedelta(days=1))
+
+    for tic in tickers:
+        df = yf.download(tic, start=start, end=yf_end, ignore_tz=True,
+                         multi_level_index=False, auto_adjust=False, progress=False)
+        pth = os.path.join(cfg.DATADIR, f'{tic.lower()}_prc.csv')
+        df.to_csv(pth)
 
 
 # ----------------------------------------------------------------------------
@@ -161,7 +170,14 @@ def read_prc_csv(tic, start, end, prc_col='Adj Close'):
        'aaa.csv' are different files).
 
     """
-    # <COMPLETE THIS PART>
+    pth = os.path.join(cfg.DATADIR, f'{tic.lower()}_prc.csv')
+    prc = pd.read_csv(pth, parse_dates=['Date'], index_col='Date')
+    prc.sort_index(inplace=True)
+
+    ser = prc.loc[start:end, prc_col]   # slice dates (inclusive) and take Adj Close
+    ser = ser.dropna()
+    ser.name = tic.lower()
+    return ser
 
 
 # ----------------------------------------------------------------------------
@@ -249,8 +265,10 @@ def daily_return_cal(prc):
      - Ensure that the returns do not contain any entries with null values.
 
     """
-    # <COMPLETE THIS PART>
-
+    prc = prc.sort_index()
+    daily_ret = prc.pct_change()
+    daily_ret = daily_ret.dropna()
+    return daily_ret
 
 # ----------------------------------------------------------------------------
 # Part 4.5: Complete the monthly_return_cal function
@@ -352,7 +370,18 @@ def monthly_return_cal(prc):
      - Ensure that the returns do not contain any entries with null values.
 
     """
-    # <COMPLETE THIS PART>
+    prc = prc.sort_index()
+
+    month_end_price = prc.resample('ME').last()  # last price of each month
+    num_prices = prc.resample('ME').count()  # number of price entries in each month
+
+    monthly_ret = month_end_price.pct_change()  # this month-end vs last month-end
+    monthly_ret = monthly_ret[num_prices >= 18]  # drop months with fewer than 18 prices
+    monthly_ret = monthly_ret.dropna()
+
+    monthly_ret.index = monthly_ret.index.to_period('M')
+    monthly_ret.index.name = 'Year_Month'
+    return monthly_ret
 
 
 # ----------------------------------------------------------------------------
@@ -466,7 +495,22 @@ def aj_ret_dict(tickers, start, end):
         memory usage: 24.0 bytes
         ----------------------------------------
     """
-    # <COMPLETE THIS PART>
+    download_prc_to_csv(start, end, tickers)
+
+    daily_lst = []
+    monthly_lst = []
+    for tic in tickers:
+        prc = read_prc_csv(tic, start, end)
+        daily_lst.append(daily_return_cal(prc))
+        monthly_lst.append(monthly_return_cal(prc))
+
+    daily_df = pd.concat(daily_lst, axis=1).sort_index()
+    daily_df.index.name = 'Date'
+
+    monthly_df = pd.concat(monthly_lst, axis=1).sort_index()
+    monthly_df.index.name = 'Year_Month'
+
+    return {'Daily': daily_df, 'Monthly': monthly_df}
 
 
 # ----------------------------------------------------------------------------
@@ -548,7 +592,7 @@ def _test_aj_ret_dict(tickers, start, end):
 
 if __name__ == "__main__":
     pass
-    # # test download_prc_to_csv function
+    # #test download_prc_to_csv function
     # _test_download_prc_to_csv()
     # #test read_prc_csv function
     # _test_read_prc_csv()
@@ -561,7 +605,7 @@ if __name__ == "__main__":
     #
     # # use made-up series to test daily_return_cal function
     # _test_monthly_return_cal()
-    # # use apple prc series to test daily_return_cal function
+    # # usse apple prc series to test daily_return_cal function
     # ser_price = read_prc_csv(tic='AAPL', start='2010-08-31', end='2011-01-10')
     # _test_monthly_return_cal(made_up_data=False, ser_prc=ser_price)
     # # test aj_ret_dict function
