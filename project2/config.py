@@ -1,6 +1,6 @@
 """ config.py
 
-Configuration options for the project2 package         
+Configuration options for the project2 package
 
 """
 # IMPORTANT: Please do NOT modify this file except for defining the TICMAP dictionary
@@ -58,17 +58,66 @@ DATADIR = os.path.join(ROOTDIR, 'data')
 
 
 TICMAP = {
-    # <COMPLETE THIS PART>
+'A': 'Agilent Technologies, Inc.',
+    'ABT': 'Abbott Laboratories',
+    'AES': 'The AES Corporation',
+    'AIG': 'American International Group, Inc.',
+    'ALL': 'The Allstate Corporation',
+    'AXP': 'American Express Company',
+    'BA': 'The Boeing Company',
+    'BAC': 'Bank of America Corporation',
+    'BAX': 'Baxter International Inc.',
+    'BBY': 'Best Buy Co., Inc.',
+    'BMY': 'Bristol-Myers Squibb Company',
+    'C': 'Citigroup Inc.',
+    'CAH': 'Cardinal Health, Inc.',
+    'CAT': 'Caterpillar Inc.',
+    'CI': 'The Cigna Group',
+    'CL': 'Colgate-Palmolive Company',
+    'CVS': 'CVS Health Corporation',
+    'DIS': 'The Walt Disney Company',
+    'DUK': 'Duke Energy Corporation',
+    'EMR': 'Emerson Electric Co.',
+    'F': 'Ford Motor Company',
+    'GE': 'GE Aerospace (formerly General Electric Company)',
+    'GLW': 'Corning Incorporated',
+    'GS': 'The Goldman Sachs Group, Inc.',
+    'HAL': 'Halliburton Company',
+    'HD': 'The Home Depot, Inc.',
+    'IBM': 'International Business Machines Corporation',
+    'IP': 'International Paper Company',
+    'JBL': 'Jabil Inc.',
+    'JNJ': 'Johnson & Johnson',
+    'KO': 'The Coca-Cola Company',
+    'KR': 'The Kroger Co.',
+    'LLY': 'Eli Lilly and Company',
+    'LOW': "Lowe's Companies, Inc.",
+    'MCD': "McDonald's Corporation",
+    'MDT': 'Medtronic plc',
+    'MET': 'MetLife, Inc.',
+    'MMM': '3M Company',
+    'MO': 'Altria Group, Inc.',
+    'MRK': 'Merck & Co., Inc.',
+    'PFE': 'Pfizer Inc.',
+    'PG': 'The Procter & Gamble Company',
+    'SLB': 'SLB (formerly Schlumberger Limited)',
+    'STT': 'State Street Corporation',
+    'TGT': 'Target Corporation',
+    'UNH': 'UnitedHealth Group Incorporated',
+    'VZ': 'Verizon Communications Inc.',
+    'WFC': 'Wells Fargo & Company',
+    'WMB': 'The Williams Companies, Inc.',
+    'XOM': 'Exxon Mobil Corporation',
          }
 
 TICKERS = sorted(TICMAP.keys())
 
 
-# -------------------------------------------------------- 
+# --------------------------------------------------------
 #   Aux function to process col names
 # --------------------------------------------------------
 def standardise_colnames(df):
-    """ Renames the columns in `df` so that 
+    """ Renames the columns in `df` so that
     - Names are lower case
     - Spaces are replaced with '_'
 
@@ -111,7 +160,7 @@ def standardise_colnames(df):
         # 2) column name is not properly formatted but exists in the dataframe
         #   => Include '_' prefix
         # 3) Else: return formatted name
-        if new_name == colname: 
+        if new_name == colname:
             # Returns original column
             return colname
         elif new_name in cols:
