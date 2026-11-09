@@ -10,6 +10,14 @@
 #       For details, review the import statements in zid_project2_main.py
 
 # <COMPLETE THIS PART>
+import sys
+
+import numpy as np
+import pandas as pd
+
+import config as cfg
+import util
+import zid_project2_etl as etl
 
 
 # ----------------------------------------------------------------------------------------
@@ -147,6 +155,21 @@ def vol_cal(ret, cha_name, ret_freq_use: list):
     """
 
     # <COMPLETE THIS PART>
+    freq = ret_freq_use[0] if len(ret_freq_use) > 0 else 'Daily'
+    df_ret = ret[freq].copy()
+
+    df_ret.index = pd.DatetimeIndex(df_ret.index).to_period('M')
+    grouped = df_ret.groupby(level=0)
+    df_vol = grouped.std()
+    n_obs = grouped.count()
+
+    df = df_vol.where(n_obs >= 18)
+    df = df.dropna(how='all')
+
+    df.columns = [f"{col}_{cha_name}" for col in df.columns]
+    df.index.name = 'Year_Month'
+
+    return df
 
 
 # ----------------------------------------------------------------------------
@@ -220,6 +243,15 @@ def merge_tables(ret, df_cha, cha_name):
      - Read shift() documentations to understand how to shift the values of a DataFrame along a specified axis
     """
     # <COMPLETE THIS PART>
+    df_ret_m = ret['Monthly'].copy()
+    df_cha_lag = df_cha.copy()
+
+    df_cha_lag = df_cha_lag.shift(1, freq=df_cha_lag.index.freq)
+
+    df = df_ret_m.merge(df_cha_lag, how='left', left_index=True, right_index=True)
+    df.index.name = 'Year_Month'
+
+    return df
 
 
 # ------------------------------------------------------------------------------------
@@ -270,6 +302,11 @@ def cha_main(ret, cha_name, ret_freq_use: list):
         in the module with appropriate logic to handle the inputs and outputs as described.
     """
     # <COMPLETE THIS PART>
+    vol_input_sanity_check(ret, cha_name, ret_freq_use)
+    df_cha = vol_cal(ret, cha_name, ret_freq_use)
+    df = merge_tables(ret, df_cha, cha_name)
+
+    return df
 
 
 def _test_ret_dict_gen():
