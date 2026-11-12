@@ -21,8 +21,8 @@
 # Create import statements so that the module config.py and util.py (inside the project2 package)
 # are imported as "cfg", and "util"
 #
-# <COMPLETE THIS PART>
-
+from project2 import config as cfg
+from project2 import util
 
 # We've imported other needed scripts and defined aliases. Please keep using the same aliases for them in this project.
 
@@ -167,7 +167,7 @@ def get_avg(df: pd.DataFrame, year):
         dtype: float64
 
     """
-    # <COMPLETE THIS PART>
+    return df[df.index.year == year].mean()
 
 
 def get_cumulative_ret(df):
@@ -197,7 +197,7 @@ def get_cumulative_ret(df):
         where r1, ..., rN represents monthly returns
 
     """
-    # <COMPLETE THIS PART>
+    return (1 + df).prod() - 1
 
 
 # ----------------------------------------------------------------------------
@@ -250,13 +250,13 @@ def get_cumulative_ret(df):
 #     ticker for this stock.
 #     Use the output dictionary, DM_Ret_dict, and auxiliary function in this script
 #     to do the calculation.
-Q1_ANSWER = '?'
+Q1_ANSWER = 'AIG'
 
 
 # Q2: What is the daily average return of the stock in question 1 for the year 2008.
 #     Use the output dictionary, DM_Ret_dict, and auxiliary function in this script
 #     to do the calculation.
-Q2_ANSWER = '?'
+Q2_ANSWER = '-0.0087'
 
 
 # Q3: Which stock in your sample has the highest average monthly return for the
@@ -264,55 +264,55 @@ Q2_ANSWER = '?'
 #     ticker for this stock.
 #     Use the output dictionary, DM_Ret_dict, and auxiliary function in this script
 #     to do the calculation.
-Q3_ANSWER = '?'
+Q3_ANSWER = 'TGT'
 
 
 # Q4: What is the average monthly return of the stock in question 3 for the year 2019.
 #     Use the output dictionary, DM_Ret_dict, and auxiliary function in this script
 #     to do the calculation.
-Q4_ANSWER = '?'
+Q4_ANSWER = '0.0625'
 
 
 # Q5: What is the average monthly total volatility for the 10th stock of your investment universe
 #     in the year 2010?
 #     Use the output dataframe, Vol_Ret_mrg_df, and auxiliary function in this script
 #     to do the calculation.
-Q5_ANSWER = '?'
+Q5_ANSWER = '0.0180'
 
 
 # Q6: What is the ratio of the average monthly total volatility for the 20th stock of your investment universe
 #     in the year 2008 to that in the year 2018? Keep 1 decimal places.
 #     Use the output dataframe, Vol_Ret_mrg_df, and auxiliary function in this script
 #     to do the calculation.
-Q6_ANSWER = '?'
+Q6_ANSWER = '1.9'
 
 
 # Q7: How many effective year-month for the 30th stock in year 2010. An effective year-month
 #     row means both monthly return and total volatility are not null.
 #     Use the output dataframe, Vol_Ret_mrg_df, to do the calculation.
 #     Answer should be an integer
-Q7_ANSWER = '?'
+Q7_ANSWER = '12'
 
 
 # Q8: How many rows and columns in the EW_LS_pf_df data frame?
 #     The answer string should only include two integers separating by a comma.
 #     The first number represents number of rows.
 #     Don't include any other signs or letters etc.
-Q8_ANSWER = '?'
+Q8_ANSWER = '246,4'
 
 
 # Q9: What is the average equal weighted portfolio return of the quantile with the
 #     lowest total volatility for the year 2019?
 #     Use the output dataframe, EW_LS_pf_d, and auxiliary function in this script
 #     to do the calculation.
-Q9_ANSWER = '?'
+Q9_ANSWER = '0.0144'
 
 
 # Q10: What is the cumulative portfolio return of the total volatility long-short portfolio
 #      over the whole sample period?
 #      Use the output dataframe, EW_LS_pf_d, and auxiliary function in this script
 #      to do the calculation.
-Q10_ANSWER = '?'
+Q10_ANSWER = '0.6967'
 
 
 # ----------------------------------------------------------------------------
@@ -335,16 +335,56 @@ Q10_ANSWER = '?'
 # Please replace the '?' of ls_bar, ls_t and n_obs variables below
 # with the respective values of the 'ls' column in EW_LS_pf_df from Part 8,
 # keep 4 decimal places if it is not an integer:
-ls_bar = '?'
-ls_t = '?'
-n_obs = '?'
+ls_bar = '0.0040'
+ls_t = '1.0059'
+n_obs = '246'
 
-# <ADD THE t_stat FUNCTION HERE>
+def t_stat(df):
+    """ Returns the mean, t-stat and number of observations of the
+    long-short portfolio returns in the 'ls' column of `df`.
+
+    The t-stat tests the null hypothesis that the average monthly
+    long-short return is zero (H0: mean = 0 against H1: mean != 0):
+
+        t = mean of 'ls' / standard error of the mean of 'ls'
+
+    where the standard error is the sample standard deviation of 'ls'
+    divided by the square root of the number of observations.
+    Missing values are not included in the calculation.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Pandas DataFrame with monthly portfolio returns and a PeriodIndex
+        index, including the long-short portfolio in an 'ls' column,
+        e.g. EW_LS_pf_df, the output of `pf_main` in the pf script.
+
+    Returns
+    -------
+    df
+        A DataFrame with one row, 'ls', and three columns:
+        - ls_bar: the mean of 'ls', rounded to 4 decimal places
+        - ls_t: the t-statistic of 'ls', rounded to 4 decimal places
+        - n_obs: the number of observations of 'ls', as an integer
+    """
+    ls = df['ls'].dropna()
+    n_obs = int(ls.count())
+    ls_bar = ls.mean()
+
+    ls_se = ls.std() / n_obs ** 0.5
+    ls_t = ls_bar / ls_se
+
+    res = pd.DataFrame({'ls_bar': [round(ls_bar, 4)],
+                        'ls_t': [round(ls_t, 4)],
+                        'n_obs': [n_obs]},
+                       index=['ls'])
+    return res
 
 
 # ----------------------------------------------------------------------------
 # Part 10: project presentation
 # ----------------------------------------------------------------------------
+# YT link: 
 # ----------------------------------------------------------------------------
 # Part 11: project report
 # ----------------------------------------------------------------------------

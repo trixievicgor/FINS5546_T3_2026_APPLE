@@ -243,12 +243,11 @@ def merge_tables(ret, df_cha, cha_name):
      - Read shift() documentations to understand how to shift the values of a DataFrame along a specified axis
     """
     # <COMPLETE THIS PART>
-    df_ret_m = ret['Monthly'].copy()
-    df_cha_lag = df_cha.copy()
+    df = ret['Monthly'].copy()
+    df = df.merge(df_cha, how='left', left_index=True, right_index=True)
 
-    df_cha_lag = df_cha_lag.shift(1, freq=df_cha_lag.index.freq)
-
-    df = df_ret_m.merge(df_cha_lag, how='left', left_index=True, right_index=True)
+    cha_cols = list(df_cha.columns)
+    df[cha_cols] = df[cha_cols].shift(1)
     df.index.name = 'Year_Month'
 
     return df
